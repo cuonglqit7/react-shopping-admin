@@ -16,10 +16,15 @@ const Login = () => {
 
     return (
         <>
-            <Card style={{ width: "60%" }}>
+            <Card style={{ minWidth: "70%" }}>
                 <div className="text-center">
-                    <Title>Log in to your account</Title>
-                    <Paragraph>
+                    <img
+                        src="https://res.cloudinary.com/dmcm1qaam/image/upload/v1748706681/logo_iiums1.png"
+                        alt=""
+                        width={48}
+                    />
+                    <Title level={2}>Log in to your account</Title>
+                    <Paragraph type="secondary">
                         Welcome back! Please enter your details.
                     </Paragraph>
                 </div>
@@ -40,7 +45,12 @@ const Login = () => {
                             },
                         ]}
                     >
-                        <Input allowClear maxLength={100} type="email" />
+                        <Input
+                            placeholder="Enter your email"
+                            allowClear
+                            maxLength={100}
+                            type="email"
+                        />
                     </Form.Item>
                     <Form.Item
                         name={"password"}
@@ -52,7 +62,11 @@ const Login = () => {
                             },
                         ]}
                     >
-                        <Input.Password maxLength={100} type="Password" />
+                        <Input.Password
+                            placeholder="********"
+                            maxLength={100}
+                            type="Password"
+                        />
                     </Form.Item>
                 </Form>
 
@@ -85,7 +99,7 @@ const Login = () => {
                 <SocialLogin />
                 <div className="mt-4 text-center">
                     <Space>
-                        <Text>Don't have an account?</Text>
+                        <Text type="secondary">Don't have an account?</Text>
                         <Link to={"/sign-up"}>Sign-up</Link>
                     </Space>
                 </div>

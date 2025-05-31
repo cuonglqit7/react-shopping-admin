@@ -15,10 +15,18 @@ const SignUp = () => {
     };
     return (
         <>
-            <Card style={{ width: "60%" }}>
+            <Card style={{ minWidth: "70%" }}>
                 <div className="text-center">
-                    <Title>Create an account</Title>
-                    <Paragraph>Start for 30 day free trial.</Paragraph>
+                    <img
+                        src="https://res.cloudinary.com/dmcm1qaam/image/upload/v1748706681/logo_iiums1.png"
+                        alt=""
+                        width={48}
+                        height={48}
+                    />
+                    <Title level={2}>Create an account</Title>
+                    <Paragraph type="secondary">
+                        Start your 30 day free trial.
+                    </Paragraph>
                 </div>
                 <Form
                     layout="vertical"
@@ -37,7 +45,7 @@ const SignUp = () => {
                             },
                         ]}
                     >
-                        <Input allowClear />
+                        <Input placeholder="Enter your name" allowClear />
                     </Form.Item>
                     <Form.Item
                         name={"email"}
@@ -49,7 +57,12 @@ const SignUp = () => {
                             },
                         ]}
                     >
-                        <Input allowClear maxLength={100} type="email" />
+                        <Input
+                            placeholder="Enter your email"
+                            allowClear
+                            maxLength={100}
+                            type="email"
+                        />
                     </Form.Item>
                     <Form.Item
                         name={"password"}
@@ -61,7 +74,11 @@ const SignUp = () => {
                             },
                         ]}
                     >
-                        <Input.Password maxLength={100} type="Password" />
+                        <Input.Password
+                            placeholder="Create a password"
+                            maxLength={100}
+                            type="Password"
+                        />
                     </Form.Item>
                 </Form>
 
@@ -80,7 +97,7 @@ const SignUp = () => {
                 <SocialLogin />
                 <div className="mt-4 text-center">
                     <Space>
-                        <Text>Already have an account?</Text>
+                        <Text type="secondary">Already have an account?</Text>
                         <Link to={"/login"}>Login</Link>
                     </Space>
                 </div>
