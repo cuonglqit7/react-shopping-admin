@@ -1,8 +1,19 @@
-import { Button, Card, Checkbox, Form, Input, Space, Typography } from "antd";
+import {
+    Button,
+    Card,
+    Checkbox,
+    Form,
+    Input,
+    message,
+    Space,
+    Typography,
+} from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import handleApi from "../../apis/handleApi";
+import { useDispatch } from "react-redux";
+import { addAuth } from "../../redux/reducers/authReducer";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -10,15 +21,18 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isRemember, setIsRemember] = useState(false);
     const [form] = Form.useForm();
-
+    const dispatch = useDispatch();
     const handleLogin = async (values: { email: string; password: string }) => {
         setIsLoading(true);
         console.log(values);
 
         try {
-            const res = await handleApi("/auth/login", values, "POST");
-            console.log(res);
-        } catch (error) {
+            const res: any = await handleApi("/auth/login", values, "POST");
+
+            message.success(res.message);
+            res && dispatch(addAuth(res.data));
+        } catch (error: any) {
+            message.error(error.message);
         } finally {
             setIsLoading(false);
         }
@@ -96,6 +110,7 @@ const Login = () => {
 
                 <div className="mt-4">
                     <Button
+                        loading={isLoading}
                         type="primary"
                         style={{
                             width: "100%",

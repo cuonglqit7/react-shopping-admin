@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import Routers from "./routes/Routers";
-import { ConfigProvider, App as AppAntd } from "antd";
+import { ConfigProvider } from "antd";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 
@@ -15,11 +15,9 @@ function App() {
                 components: {},
             }}
         >
-            <AppAntd>
-                <Provider store={store}>
-                    <Routers />;
-                </Provider>
-            </AppAntd>
+            <Provider store={store}>
+                <Routers />;
+            </Provider>
         </ConfigProvider>
     );
 }
