@@ -1,7 +1,8 @@
-import { Button, Card, Checkbox, Form, Input, Space, Typography } from "antd";
+import { Button, Card, Form, Input, Space, Typography, App } from "antd";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
+import handleApi from "../../apis/handleApi";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -9,9 +10,21 @@ const SignUp = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isRemember, setIsRemember] = useState(false);
     const [form] = Form.useForm();
+    const { message } = App.useApp();
 
-    const handleLogin = (values: { email: string; password: string }) => {
+    const handleLogin = async (values: { email: string; password: string }) => {
+        setIsLoading(true);
         console.log(values);
+
+        try {
+            const res = await handleApi("/auth/register", values, "POST");
+            console.log(res);
+        } catch (error: any) {
+            console.log(error);
+            message.error(error.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
     return (
         <>
@@ -70,8 +83,21 @@ const SignUp = () => {
                         rules={[
                             {
                                 required: true,
-                                message: "Must be at least 8 characters!",
+                                message: "Pls enter your password.",
                             },
+                            () => ({
+                                validator: (_, value) => {
+                                    if (value.length < 8) {
+                                        return Promise.reject(
+                                            new Error(
+                                                "Must be at least 8 characters!"
+                                            )
+                                        );
+                                    } else {
+                                        return Promise.resolve();
+                                    }
+                                },
+                            }),
                         ]}
                     >
                         <Input.Password
@@ -84,6 +110,7 @@ const SignUp = () => {
 
                 <div className="mt-4">
                     <Button
+                        loading={isLoading}
                         type="primary"
                         style={{
                             width: "100%",
