@@ -39,7 +39,7 @@ const SocialLogin = (props: Props) => {
                     const api = `/auth/login-google`;
 
                     try {
-                        const res: any = await handleApi(api, data, "POST");
+                        const res: any = await handleApi(api, data, "post");
 
                         message.success(res.message);
                         dispatch(addAuth(res.data));

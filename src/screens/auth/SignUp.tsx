@@ -19,7 +19,7 @@ const SignUp = () => {
         console.log(values);
 
         try {
-            const res: any = await handleApi("/auth/register", values, "POST");
+            const res: any = await handleApi("/auth/register", values, "post");
             if (res.data) {
                 message.success(res.data.message);
                 dispatch(addAuth(res.data));

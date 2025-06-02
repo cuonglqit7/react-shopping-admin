@@ -15,7 +15,6 @@ import { useDispatch } from "react-redux";
 import handleApi from "../../apis/handleApi";
 import { addAuth } from "../../redux/reducers/authReducer";
 import { localDataNames } from "../../constants/appInfor";
-import { auth } from "../../firebase/firebaseConfig";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -29,7 +28,7 @@ const Login = () => {
         console.log(values);
 
         try {
-            const res: any = await handleApi("/auth/login", values, "POST");
+            const res: any = await handleApi("/auth/login", values, "post");
 
             message.success(res.message);
             res && dispatch(addAuth(res.data));

@@ -5,7 +5,6 @@ import { removeAuth } from "../redux/reducers/authReducer";
 
 function HomeScreen() {
     const dispatch = useDispatch();
-
     const handleLogout = () => {
         dispatch(removeAuth({}));
     };
