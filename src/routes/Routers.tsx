@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import AuthRouter from "./AuthRouter";
-import MainRouter from "./MainRouter";
 import { useDispatch, useSelector } from "react-redux";
 import {
     addAuth,
@@ -9,6 +7,8 @@ import {
 } from "../redux/reducers/authReducer";
 import { localDataNames } from "../constants/appInfor";
 import { Spin } from "antd";
+import AuthRouter from "./AuthRouter";
+import MainRouter from "./MainRouter";
 
 const Routers = () => {
     const [isLoading, setIsLoading] = useState(false);

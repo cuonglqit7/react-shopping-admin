@@ -2,10 +2,9 @@ import { Button, Card, Form, Input, Space, Typography, App } from "antd";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
-import handleApi from "../../apis/handleApi";
 import { useDispatch } from "react-redux";
 import { addAuth } from "../../redux/reducers/authReducer";
-import { localDataNames } from "../../constants/appInfor";
+import handleApi from "../../apis/handleApi";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -34,7 +33,7 @@ const SignUp = () => {
     };
     return (
         <>
-            <Card style={{ minWidth: "70%" }}>
+            <Card loading={isLoading} style={{ minWidth: "70%" }}>
                 <div className="text-center">
                     <img
                         src="https://res.cloudinary.com/dmcm1qaam/image/upload/v1748706681/logo_iiums1.png"
@@ -51,7 +50,7 @@ const SignUp = () => {
                     layout="vertical"
                     form={form}
                     onFinish={handleLogin}
-                    // disabled
+                    disabled={isLoading}
                     size="large"
                 >
                     <Form.Item
@@ -131,7 +130,7 @@ const SignUp = () => {
                 <div className="mt-4 text-center">
                     <Space>
                         <Text type="secondary">Already have an account?</Text>
-                        <Link to={"/login"}>Login</Link>
+                        <Link to={"/"}>Login</Link>
                     </Space>
                 </div>
             </Card>

@@ -11,9 +11,11 @@ import {
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
-import handleApi from "../../apis/handleApi";
 import { useDispatch } from "react-redux";
+import handleApi from "../../apis/handleApi";
 import { addAuth } from "../../redux/reducers/authReducer";
+import { localDataNames } from "../../constants/appInfor";
+import { auth } from "../../firebase/firebaseConfig";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -31,6 +33,13 @@ const Login = () => {
 
             message.success(res.message);
             res && dispatch(addAuth(res.data));
+
+            if (isRemember) {
+                localStorage.setItem(
+                    localDataNames.authData,
+                    JSON.stringify(res.data)
+                );
+            }
         } catch (error: any) {
             message.error(error.message);
         } finally {
@@ -56,7 +65,7 @@ const Login = () => {
                     layout="vertical"
                     form={form}
                     onFinish={handleLogin}
-                    // disabled
+                    disabled={isLoading}
                     size="large"
                 >
                     <Form.Item
@@ -121,7 +130,7 @@ const Login = () => {
                         Login
                     </Button>
                 </div>
-                <SocialLogin />
+                <SocialLogin isRemember={isRemember} />
                 <div className="mt-4 text-center">
                     <Space>
                         <Text type="secondary">Don't have an account?</Text>
