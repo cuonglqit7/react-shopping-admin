@@ -73,7 +73,7 @@ const SiderComponent = () => {
         },
     ];
     return (
-        <Sider theme="light" style={{ height: "100vh" }}>
+        <Sider theme="light" style={{ height: "100vh" }} width={280}>
             <div className="mt-2 mb-2 text-center">
                 <img
                     src="https://res.cloudinary.com/dmcm1qaam/image/upload/v1748706681/logo_iiums1.png"
