@@ -5,17 +5,16 @@ import {
     Input,
     message,
     Modal,
-    Radio,
     Select,
     Typography,
 } from "antd";
 import { User } from "iconsax-react";
-import React, { useRef, useState } from "react";
-import { colors } from "../constants/color";
+import { useEffect, useRef, useState } from "react";
 import handleApi from "../apis/handleApi";
-import { uploadFileCloudinary } from "../utils/uploadFile";
-import { replaceNameFile } from "../utils/replaceNameFile";
+import { colors } from "../constants/color";
 import { SupplierModel } from "../models/supplierModel";
+import { replaceNameFile } from "../utils/replaceNameFile";
+import { uploadFileCloudinary } from "../utils/uploadFile";
 
 interface Props {
     visible: boolean;
@@ -34,11 +33,19 @@ const ToggleSupplier = (props: Props) => {
     const [form] = Form.useForm();
     const inpRef = useRef<HTMLInputElement>(null);
 
+    useEffect(() => {
+        if (supplier) {
+            form.setFieldsValue(supplier);
+
+            setIsTasking(supplier.isTasking === 1);
+        }
+    }, [supplier]);
+
     const addNewSupplier = async (values: any) => {
         setIsLoading(true);
 
         const data: any = {};
-        const api = `/supplier`;
+        const api = `/supplier/${supplier ? `update?id=${supplier._id}` : ""}`;
 
         for (const i in values) {
             data[i] = values[i] ?? "";
@@ -54,11 +61,14 @@ const ToggleSupplier = (props: Props) => {
         data.slug = replaceNameFile(values.name);
 
         try {
-            const res: any = await handleApi(api, data, "post");
-            console.log(res);
+            const res: any = await handleApi(
+                api,
+                data,
+                supplier ? "put" : "post"
+            );
 
             message.success(res.message);
-            onAddNew(res.data);
+            !supplier && onAddNew(res.data);
             hanldeClose();
         } catch (error) {
             console.log(error);
@@ -76,8 +86,8 @@ const ToggleSupplier = (props: Props) => {
             closable={!isLoading}
             open={visible}
             onCancel={hanldeClose}
-            title="New supplier"
-            okText="Add supplier"
+            title={supplier ? "Edit supplier" : "New supplier"}
+            okText={supplier ? "Update supplier" : "Add supplier"}
             cancelText="Discard"
             onOk={() => form.submit()}
             okButtonProps={{ loading: isLoading }}
@@ -89,7 +99,7 @@ const ToggleSupplier = (props: Props) => {
                 form={form}
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
-                size="large"
+                size="small"
             >
                 <div className="d-none">
                     <input
@@ -107,6 +117,8 @@ const ToggleSupplier = (props: Props) => {
                 >
                     {file ? (
                         <Avatar size={80} src={URL.createObjectURL(file)} />
+                    ) : supplier ? (
+                        <Avatar size={80} src={supplier.photo_url} />
                     ) : (
                         <Avatar
                             style={{
@@ -145,6 +157,16 @@ const ToggleSupplier = (props: Props) => {
                 <Form.Item name={"product"} label="Product">
                     <Input placeholder="Enter product" allowClear />
                 </Form.Item>
+                <Form.Item name={"email"} label="Email">
+                    <Input placeholder="Enter email" allowClear type="email" />
+                </Form.Item>
+                <Form.Item name={"active"} label="Active">
+                    <Input
+                        placeholder="Enter active"
+                        allowClear
+                        type="number"
+                    />
+                </Form.Item>
                 <Form.Item name={"category"} label="Category">
                     <Select
                         options={[]}
@@ -164,7 +186,7 @@ const ToggleSupplier = (props: Props) => {
                 <Form.Item label="Type">
                     <div className="mb-2">
                         <Button
-                            size="middle"
+                            size="small"
                             onClick={() => setIsTasking(false)}
                             type={isTasking === false ? "primary" : "default"}
                         >
@@ -173,7 +195,7 @@ const ToggleSupplier = (props: Props) => {
                     </div>
                     <div>
                         <Button
-                            size="middle"
+                            size="small"
                             onClick={() => setIsTasking(true)}
                             type={isTasking ? "primary" : "default"}
                         >
