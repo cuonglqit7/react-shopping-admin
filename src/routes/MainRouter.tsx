@@ -1,5 +1,5 @@
 import React from "react";
-import { Layout } from "antd";
+import { Affix, Layout } from "antd";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
     HomeScreen,
@@ -18,9 +18,13 @@ const MainRouter = () => {
     return (
         <BrowserRouter>
             <Layout>
-                <SiderComponent />
+                <Affix offsetTop={0}>
+                    <SiderComponent />
+                </Affix>
                 <Layout>
-                    <HeaderComponent />
+                    <Affix offsetTop={0}>
+                        <HeaderComponent />
+                    </Affix>
                     <Content className="mt-2 mb-2 container">
                         <Routes>
                             <Route path="/" element={<HomeScreen />}></Route>

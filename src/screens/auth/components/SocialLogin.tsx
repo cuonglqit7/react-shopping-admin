@@ -9,9 +9,9 @@ import { localDataNames } from "../../../constants/appInfor";
 
 const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
-provider.setCustomParameters({
-    login_hint: "lequoccuong207@gmail.com",
-});
+// provider.setCustomParameters({
+//     login_hint: "lequoccuong207@gmail.com",
+// });
 
 interface Props {
     isRemember?: boolean;
@@ -34,6 +34,7 @@ const SocialLogin = (props: Props) => {
                     const data = {
                         name: user.displayName,
                         email: user.email,
+                        photo_url: user.photoURL,
                     };
 
                     const api = `/auth/login-google`;

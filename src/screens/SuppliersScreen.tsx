@@ -24,7 +24,18 @@ const SuppliersScreen = () => {
     const [suppliers, setSuppliers] = useState<SupplierModel[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [supplierSelected, setSupplierSelected] = useState<SupplierModel>();
+    const [pageSize, setPageSize] = useState(10);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState<number>(10);
     const columnProps: ColumnProps<SupplierModel>[] = [
+        {
+            title: "ID",
+            dataIndex: "_id",
+            render: (_: any, __: any, index: number) => {
+                return (page - 1) * pageSize + index + 1;
+            },
+            align: "center",
+        },
         {
             key: "name",
             dataIndex: "name",
@@ -98,15 +109,16 @@ const SuppliersScreen = () => {
 
     useEffect(() => {
         getSuppliers();
-    }, []);
+    }, [page, pageSize]);
 
     const getSuppliers = async () => {
         setIsLoading(true);
-        const api = "/supplier";
+        const api = `/supplier?page=${page}&pageSize=${pageSize}`;
         try {
             const res: any = await handleApi(api);
 
-            res.data && setSuppliers(res.data);
+            res.data && setSuppliers(res.data.items);
+            setTotal(res.data.total);
         } catch (error: any) {
             console.log(error);
             message.error(error.message);
@@ -134,6 +146,29 @@ const SuppliersScreen = () => {
         }
     };
 
+    // const hanldeAddDemoData = () => {
+    //     demoData.forEach(async (item) => {
+    //         const data = {
+    //             name: item.name,
+    //             product: item.product,
+    //             email: item.email,
+    //             active: item.active,
+    //             categories: "",
+    //             price: item.price,
+    //             contact: item.contact,
+    //             isTasking: item.isTasking,
+    //             slug: item.slug,
+    //         };
+
+    //         const api = `/supplier`;
+    //         try {
+    //             await handleApi(api, data, "post");
+    //         } catch (error) {
+    //             console.log(error);
+    //         }
+    //     });
+    // };
+
     const title = () => (
         <div className="row">
             <div className="col">
@@ -158,6 +193,20 @@ const SuppliersScreen = () => {
     return (
         <div>
             <Table
+                rowKey="_id"
+                pagination={{
+                    showSizeChanger: true,
+                    onShowSizeChange(current, size) {
+                        setPageSize(size);
+                    },
+                    total,
+                    onChange(page, pageSize) {
+                        setPage(page);
+                    },
+                }}
+                scroll={{
+                    y: "calc(100vh - 300px)",
+                }}
                 loading={isLoading}
                 columns={columnProps}
                 dataSource={suppliers}

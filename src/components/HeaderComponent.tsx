@@ -1,8 +1,27 @@
-import { Avatar, Button, Input, Layout, Space } from "antd";
-import { NotificationBing, SearchNormal, SearchNormal1 } from "iconsax-react";
-import React from "react";
+import { Avatar, Button, Dropdown, Input, MenuProps, Space } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { authSelector, removeAuth } from "../redux/reducers/authReducer";
+import { auth } from "../firebase/firebaseConfig";
+import { NotificationBing, SearchNormal1 } from "iconsax-react";
+import { useNavigate } from "react-router-dom";
 
 const HeaderComponent = () => {
+    const user = useSelector(authSelector);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const items: MenuProps["items"] = [
+        {
+            key: "logout",
+            label: "Log out",
+            onClick: async () => {
+                auth.signOut();
+                dispatch(removeAuth({}));
+                localStorage.clear();
+                navigate("/");
+            },
+        },
+    ];
     return (
         <div className="p-4 ms-1 row bg-white">
             <div className="col">
@@ -22,10 +41,9 @@ const HeaderComponent = () => {
                         type="text"
                         icon={<NotificationBing size={20} color="#5D6679" />}
                     />
-                    <Avatar
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRP6VhXB2tcqYOWyKBgwUzMt-GJRmcnUX0vvA&s"
-                        size={40}
-                    />
+                    <Dropdown menu={{ items }}>
+                        <Avatar src={user.photo_url} size={40} />
+                    </Dropdown>
                 </Space>
             </div>
         </div>
