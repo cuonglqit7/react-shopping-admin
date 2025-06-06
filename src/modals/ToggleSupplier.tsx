@@ -1,13 +1,4 @@
-import {
-    Avatar,
-    Button,
-    Form,
-    Input,
-    message,
-    Modal,
-    Select,
-    Typography,
-} from "antd";
+import { Avatar, Button, Form, message, Modal, Typography } from "antd";
 import { User } from "iconsax-react";
 import { useEffect, useRef, useState } from "react";
 import handleApi from "../apis/handleApi";
@@ -15,6 +6,8 @@ import { colors } from "../constants/color";
 import { SupplierModel } from "../models/supplierModel";
 import { replaceNameFile } from "../utils/replaceNameFile";
 import { uploadFileCloudinary } from "../utils/uploadFile";
+import { FormItemModel, FormModel } from "../models/FormModel";
+import FormItem from "../components/FormItem";
 
 interface Props {
     visible: boolean;
@@ -32,6 +25,12 @@ const ToggleSupplier = (props: Props) => {
     const [file, setFile] = useState<any>();
     const [form] = Form.useForm();
     const inpRef = useRef<HTMLInputElement>(null);
+    const [isGetting, setIsGetting] = useState(false);
+    const [formData, setFormData] = useState<FormModel>();
+
+    useEffect(() => {
+        getFormData();
+    }, [visible]);
 
     useEffect(() => {
         if (supplier) {
@@ -77,12 +76,27 @@ const ToggleSupplier = (props: Props) => {
         }
     };
 
+    const getFormData = async () => {
+        setIsGetting(true);
+        const api = `/supplier/get-form`;
+        try {
+            const res: any = await handleApi(api);
+
+            res.data && setFormData(res.data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsGetting(false);
+        }
+    };
+
     const hanldeClose = () => {
         form.resetFields();
         onClose();
     };
     return (
         <Modal
+            loading={isGetting}
             closable={!isLoading}
             open={visible}
             onCancel={hanldeClose}
@@ -92,118 +106,84 @@ const ToggleSupplier = (props: Props) => {
             onOk={() => form.submit()}
             okButtonProps={{ loading: isLoading }}
         >
-            <Form
-                disabled={isLoading}
-                onFinish={addNewSupplier}
-                layout="horizontal"
-                form={form}
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                size="small"
-            >
-                <div className="d-none">
-                    <input
-                        type="file"
-                        name=""
-                        accept="image/*"
-                        id="inpFile"
-                        ref={inpRef}
-                        onChange={(val: any) => setFile(val.target.files[0])}
-                    />
-                </div>
-                <label
-                    htmlFor="inpFile"
-                    className="d-flex align-items-center p-2 mb-3 justify-content-center gap-4"
+            {formData && (
+                <Form
+                    disabled={isLoading}
+                    onFinish={addNewSupplier}
+                    layout={formData.layout}
+                    form={form}
+                    labelCol={{ span: formData.labelCol }}
+                    wrapperCol={{ span: formData.wrapperCol }}
+                    size={formData.size}
                 >
-                    {file ? (
-                        <Avatar size={80} src={URL.createObjectURL(file)} />
-                    ) : supplier ? (
-                        <Avatar size={80} src={supplier.photo_url} />
+                    {formData.fileUpload ? (
+                        <>
+                            <div className="d-none">
+                                <input
+                                    type="file"
+                                    name=""
+                                    accept="image/*"
+                                    id="inpFile"
+                                    ref={inpRef}
+                                    onChange={(val: any) =>
+                                        setFile(val.target.files[0])
+                                    }
+                                />
+                            </div>
+                            <label
+                                htmlFor="inpFile"
+                                className="d-flex align-items-center p-2 mb-3 justify-content-center gap-4"
+                            >
+                                {file ? (
+                                    <Avatar
+                                        size={80}
+                                        src={URL.createObjectURL(file)}
+                                    />
+                                ) : supplier ? (
+                                    <Avatar
+                                        size={80}
+                                        src={supplier.photo_url}
+                                    />
+                                ) : (
+                                    <Avatar
+                                        style={{
+                                            backgroundColor: "white",
+                                            border: "1px dashed #5D6679",
+                                        }}
+                                        size={80}
+                                        icon={
+                                            <User
+                                                size={60}
+                                                color={colors.gray600}
+                                            />
+                                        }
+                                    />
+                                )}
+                                <div className="ml-3 text-center">
+                                    <Paragraph className="text-muted m-0 mb-2">
+                                        Drag image here
+                                    </Paragraph>
+                                    <Paragraph className="text-muted mb-0">
+                                        Or
+                                    </Paragraph>
+                                    <Button
+                                        onClick={() => inpRef.current?.click()}
+                                        type="link"
+                                    >
+                                        Browse image
+                                    </Button>
+                                </div>
+                            </label>
+                        </>
                     ) : (
-                        <Avatar
-                            style={{
-                                backgroundColor: "white",
-                                border: "1px dashed #5D6679",
-                            }}
-                            size={80}
-                            icon={<User size={60} color={colors.gray600} />}
-                        />
+                        <></>
                     )}
-                    <div className="ml-3 text-center">
-                        <Paragraph className="text-muted m-0 mb-2">
-                            Drag image here
-                        </Paragraph>
-                        <Paragraph className="text-muted mb-0">Or</Paragraph>
-                        <Button
-                            onClick={() => inpRef.current?.click()}
-                            type="link"
-                        >
-                            Browse image
-                        </Button>
-                    </div>
-                </label>
-                <Form.Item
-                    name={"name"}
-                    label="Supplier name"
-                    rules={[
-                        {
-                            required: true,
-                            message: "Enter supplier name.",
-                        },
-                    ]}
-                >
-                    <Input placeholder="Enter supplier name" allowClear />
-                </Form.Item>
-                <Form.Item name={"product"} label="Product">
-                    <Input placeholder="Enter product" allowClear />
-                </Form.Item>
-                <Form.Item name={"email"} label="Email">
-                    <Input placeholder="Enter email" allowClear type="email" />
-                </Form.Item>
-                <Form.Item name={"active"} label="Active">
-                    <Input
-                        placeholder="Enter active"
-                        allowClear
-                        type="number"
-                    />
-                </Form.Item>
-                <Form.Item name={"category"} label="Category">
-                    <Select
-                        options={[]}
-                        placeholder="Select product category"
-                    />
-                </Form.Item>
-                <Form.Item name={"price"} label="Buying Price">
-                    <Input
-                        placeholder="Enter buying price"
-                        allowClear
-                        type="number"
-                    />
-                </Form.Item>
-                <Form.Item name={"contact"} label="Contact Number">
-                    <Input placeholder="Enter contact number" allowClear />
-                </Form.Item>
-                <Form.Item label="Type">
-                    <div className="mb-2">
-                        <Button
-                            size="small"
-                            onClick={() => setIsTasking(false)}
-                            type={isTasking === false ? "primary" : "default"}
-                        >
-                            Not tasking return
-                        </Button>
-                    </div>
-                    <div>
-                        <Button
-                            size="small"
-                            onClick={() => setIsTasking(true)}
-                            type={isTasking ? "primary" : "default"}
-                        >
-                            Tasking return
-                        </Button>
-                    </div>
-                </Form.Item>
-            </Form>
+
+                    {formData.formItems.map((item: FormItemModel) => (
+                        <FormItem item={item} />
+                    ))}
+                </Form>
+            )}
         </Modal>
     );
 };

@@ -138,7 +138,7 @@ const SuppliersScreen = () => {
                 "delete"
             );
 
-            getSuppliers();
+            await getSuppliers();
             message.success(res.message);
         } catch (error: any) {
             console.log(error.message);
