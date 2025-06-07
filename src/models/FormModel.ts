@@ -28,6 +28,7 @@ export interface FormItemModel {
         | "checkbox";
     lockup_item: SelectModel[];
     default_value: string;
+    displayLenght: number;
 }
 
 export interface SelectModel {

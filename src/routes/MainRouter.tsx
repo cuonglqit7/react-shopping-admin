@@ -50,7 +50,7 @@ const MainRouter = () => {
                             ></Route>
                         </Routes>
                     </Content>
-                    <Footer />
+                    {/* <Footer /> */}
                 </Layout>
             </Layout>
         </BrowserRouter>

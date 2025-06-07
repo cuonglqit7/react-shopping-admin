@@ -14,6 +14,8 @@ import handleApi from "../apis/handleApi";
 import { colors } from "../constants/color";
 import { ToggleSupplier } from "../modals";
 import { SupplierModel } from "../models/supplierModel";
+import { FormModel } from "../models/FormModel";
+import TableComponent from "../components/TableComponent";
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
@@ -27,89 +29,35 @@ const SuppliersScreen = () => {
     const [pageSize, setPageSize] = useState(10);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState<number>(10);
-    const columnProps: ColumnProps<SupplierModel>[] = [
-        {
-            title: "ID",
-            dataIndex: "_id",
-            render: (_: any, __: any, index: number) => {
-                return (page - 1) * pageSize + index + 1;
-            },
-            align: "center",
-        },
-        {
-            key: "name",
-            dataIndex: "name",
-            title: "Supplier name",
-        },
-        {
-            key: "product",
-            dataIndex: "product",
-            title: "Product",
-        },
-        {
-            key: "email",
-            dataIndex: "email",
-            title: "Email",
-        },
-        {
-            key: "contact",
-            dataIndex: "contact",
-            title: "Contact",
-        },
-        {
-            key: "type",
-            dataIndex: "isTasking",
-            title: "Type",
-            render: (isTascking: boolean) => (
-                <Text type={isTascking ? "success" : "warning"}>
-                    {isTascking ? "Tasking return" : "Not tasking return"}
-                </Text>
-            ),
-        },
-        {
-            key: "active",
-            dataIndex: "active",
-            title: "On the way",
-            render: (num) => num ?? "-",
-        },
-        {
-            key: "buttonContainer",
-            dataIndex: "",
-            title: "Actions",
-            render: (item: SupplierModel) => (
-                <Space>
-                    <Tooltip title="Edit">
-                        <Button
-                            type="text"
-                            onClick={() => {
-                                setSupplierSelected(item);
-                                setIsVisibleAddNewModelSupplier(true);
-                            }}
-                            icon={<Edit className="text-info" size={20} />}
-                        ></Button>
-                    </Tooltip>
-                    <Tooltip title="Move to trash">
-                        <Button
-                            type="text"
-                            onClick={() =>
-                                confirm({
-                                    title: "confirm",
-                                    content:
-                                        "Bạn có chắc muốn xóa supplier này?",
-                                    onOk: () => removeSupplier(item._id),
-                                })
-                            }
-                            icon={<Trash className="text-danger" size={20} />}
-                        ></Button>
-                    </Tooltip>
-                </Space>
-            ),
-        },
-    ];
+    const [columns, setColumns] = useState<any>();
+    const [forms, setForms] = useState<FormModel>();
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     useEffect(() => {
         getSuppliers();
     }, [page, pageSize]);
+
+    const getData = async () => {
+        setIsLoading(true);
+        try {
+            // await getSuppliers();
+            await getForms();
+        } catch (error: any) {
+            message.error(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const getForms = async () => {
+        const api = `/supplier/get-form`;
+        const res: any = await handleApi(api);
+
+        res.data && setForms(res.data);
+    };
 
     const getSuppliers = async () => {
         setIsLoading(true);
@@ -117,10 +65,19 @@ const SuppliersScreen = () => {
         try {
             const res: any = await handleApi(api);
 
-            res.data && setSuppliers(res.data.items);
+            const items: SupplierModel[] = [];
+
+            res.data &&
+                res.data.items.forEach((item: any, index: number) =>
+                    items.push({
+                        index: (page - 1) * pageSize + (index + 1),
+                        ...item,
+                    })
+                );
+
+            setSuppliers(items);
             setTotal(res.data.total);
         } catch (error: any) {
-            console.log(error);
             message.error(error.message);
         } finally {
             setIsLoading(false);
@@ -146,72 +103,57 @@ const SuppliersScreen = () => {
         }
     };
 
-    // const hanldeAddDemoData = () => {
-    //     demoData.forEach(async (item) => {
-    //         const data = {
-    //             name: item.name,
-    //             product: item.product,
-    //             email: item.email,
-    //             active: item.active,
-    //             categories: "",
-    //             price: item.price,
-    //             contact: item.contact,
-    //             isTasking: item.isTasking,
-    //             slug: item.slug,
-    //         };
-
-    //         const api = `/supplier`;
-    //         try {
-    //             await handleApi(api, data, "post");
-    //         } catch (error) {
-    //             console.log(error);
-    //         }
-    //     });
-    // };
-
-    const title = () => (
-        <div className="row">
-            <div className="col">
-                <Title level={5}>Suppliers</Title>
-            </div>
-            <div className="col text-end">
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => setIsVisibleAddNewModelSupplier(true)}
-                    >
-                        Add Product
-                    </Button>
-                    <Button icon={<Sort size={20} color={colors.gray600} />}>
-                        Filters
-                    </Button>
-                    <Button>Download all</Button>
-                </Space>
-            </div>
-        </div>
-    );
     return (
         <div>
-            <Table
-                rowKey="_id"
-                pagination={{
-                    showSizeChanger: true,
-                    onShowSizeChange(current, size) {
-                        setPageSize(size);
-                    },
-                    total,
-                    onChange(page, pageSize) {
-                        setPage(page);
-                    },
-                }}
-                scroll={{
-                    y: "calc(100vh - 300px)",
-                }}
-                loading={isLoading}
-                columns={columnProps}
-                dataSource={suppliers}
-                title={title}
-            />
+            {forms && (
+                <TableComponent
+                    forms={forms}
+                    records={suppliers}
+                    isLoading={isLoading}
+                    total={total}
+                    onPageChange={(val) => {
+                        setPage(val.page);
+                        setPageSize(val.pageSize);
+                    }}
+                    onAddNew={() => setIsVisibleAddNewModelSupplier(true)}
+                    extraColumns={(item: any) => (
+                        <Space>
+                            <Tooltip title="Edit">
+                                <Button
+                                    type="text"
+                                    onClick={() => {
+                                        setSupplierSelected(item);
+                                        setIsVisibleAddNewModelSupplier(true);
+                                    }}
+                                    icon={
+                                        <Edit className="text-info" size={20} />
+                                    }
+                                ></Button>
+                            </Tooltip>
+                            <Tooltip title="Move to trash">
+                                <Button
+                                    type="text"
+                                    onClick={() =>
+                                        confirm({
+                                            title: "confirm",
+                                            content:
+                                                "Bạn có chắc muốn xóa supplier này?",
+                                            onOk: () =>
+                                                removeSupplier(item._id),
+                                        })
+                                    }
+                                    icon={
+                                        <Trash
+                                            className="text-danger"
+                                            size={20}
+                                        />
+                                    }
+                                ></Button>
+                            </Tooltip>
+                        </Space>
+                    )}
+                />
+            )}
             <ToggleSupplier
                 visible={isVisibleAddNewModelSupplier}
                 onClose={() => {
