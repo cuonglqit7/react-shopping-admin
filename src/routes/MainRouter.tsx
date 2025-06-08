@@ -25,7 +25,7 @@ const MainRouter = () => {
                     <Affix offsetTop={0}>
                         <HeaderComponent />
                     </Affix>
-                    <Content className="mt-2 mb-2 container">
+                    <Content className="p-2">
                         <Routes>
                             <Route path="/" element={<HomeScreen />}></Route>
                             <Route

@@ -5,6 +5,7 @@ import type { ColumnProps } from "antd/es/table";
 import { Sort } from "iconsax-react";
 import { colors } from "../constants/color";
 import { render } from "@testing-library/react";
+import { Resizable } from "re-resizable";
 
 interface Props {
     forms: FormModel;
@@ -99,7 +100,38 @@ const TableComponent = (props: Props) => {
             </div>
         </div>
     );
-    console.log(columns);
+
+    const renderTitle = (props: any) => {
+        const { children, ...resProps } = props;
+        return (
+            <th {...resProps}>
+                <Resizable
+                    enable={{ right: true }}
+                    onResizeStop={(_event, _direction, _elementRef, delta) => {
+                        const item: any = columns.find(
+                            (e) => e.title === children[1]
+                        );
+                        if (item) {
+                            const items = [...columns];
+                            const newWidth = item.width + delta.width;
+
+                            const index = columns.findIndex(
+                                (e) => e.key === item.key
+                            );
+
+                            if (index !== -1) {
+                                items[index].width = newWidth;
+                            }
+
+                            setColumns(items);
+                        }
+                    }}
+                >
+                    {children}
+                </Resizable>
+            </th>
+        );
+    };
 
     return (
         <Table
@@ -122,6 +154,11 @@ const TableComponent = (props: Props) => {
             dataSource={records}
             columns={columns}
             title={title}
+            components={{
+                header: {
+                    cell: renderTitle,
+                },
+            }}
         />
     );
 };

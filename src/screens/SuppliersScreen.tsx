@@ -1,23 +1,12 @@
-import {
-    Button,
-    message,
-    Modal,
-    Space,
-    Table,
-    Tooltip,
-    Typography,
-} from "antd";
-import { ColumnProps } from "antd/es/table";
-import { Edit, Sort, Trash } from "iconsax-react";
+import { Button, message, Modal, Space, Tooltip } from "antd";
+import { Edit, Trash } from "iconsax-react";
 import { useEffect, useState } from "react";
 import handleApi from "../apis/handleApi";
-import { colors } from "../constants/color";
-import { ToggleSupplier } from "../modals";
-import { SupplierModel } from "../models/supplierModel";
-import { FormModel } from "../models/FormModel";
 import TableComponent from "../components/TableComponent";
+import { ToggleSupplier } from "../modals";
+import { FormModel } from "../models/FormModel";
+import { SupplierModel } from "../models/supplierModel";
 
-const { Title, Text } = Typography;
 const { confirm } = Modal;
 
 const SuppliersScreen = () => {
@@ -29,7 +18,6 @@ const SuppliersScreen = () => {
     const [pageSize, setPageSize] = useState(10);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState<number>(10);
-    const [columns, setColumns] = useState<any>();
     const [forms, setForms] = useState<FormModel>();
 
     useEffect(() => {
@@ -96,9 +84,8 @@ const SuppliersScreen = () => {
             );
 
             await getSuppliers();
-            message.success(res.message);
+            message.error(res.message);
         } catch (error: any) {
-            console.log(error.message);
             message.error(error.message);
         }
     };
