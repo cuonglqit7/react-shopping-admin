@@ -6,6 +6,8 @@ import { Sort } from "iconsax-react";
 import { colors } from "../constants/color";
 import { render } from "@testing-library/react";
 import { Resizable } from "re-resizable";
+import { utils, writeFile } from "xlsx";
+import { ToggleExportData } from "../modals";
 
 interface Props {
     forms: FormModel;
@@ -16,6 +18,7 @@ interface Props {
     scrollHeight?: string;
     total: number;
     extraColumns: (item: any) => void;
+    api: string;
 }
 
 const { Title } = Typography;
@@ -30,6 +33,7 @@ const TableComponent = (props: Props) => {
         scrollHeight,
         total,
         extraColumns,
+        api,
     } = props;
 
     const [pageInfo, setPageInfo] = useState<{
@@ -41,6 +45,7 @@ const TableComponent = (props: Props) => {
     });
 
     const [columns, setColumns] = useState<ColumnProps<any>[]>([]);
+    const [isvisibleExportModal, setIsVisibleExportModal] = useState(false);
 
     useEffect(() => {
         onPageChange(pageInfo);
@@ -95,7 +100,9 @@ const TableComponent = (props: Props) => {
                     <Button icon={<Sort size={20} color={colors.gray600} />}>
                         Filters
                     </Button>
-                    <Button>Download all</Button>
+                    <Button onClick={() => setIsVisibleExportModal(true)}>
+                        Export to excel
+                    </Button>
                 </Space>
             </div>
         </div>
@@ -134,32 +141,41 @@ const TableComponent = (props: Props) => {
     };
 
     return (
-        <Table
-            bordered
-            pagination={{
-                showSizeChanger: true,
-                onShowSizeChange(current, size) {
-                    setPageInfo({ ...pageInfo, pageSize: size });
-                },
-                total,
-                onChange(page, pageSize) {
-                    setPageInfo({ ...pageInfo, page });
-                },
-                showQuickJumper: true,
-            }}
-            scroll={{
-                y: scrollHeight ? scrollHeight : "calc(100vh - 300px)",
-            }}
-            loading={isLoading}
-            dataSource={records}
-            columns={columns}
-            title={title}
-            components={{
-                header: {
-                    cell: renderTitle,
-                },
-            }}
-        />
+        <>
+            <Table
+                bordered
+                pagination={{
+                    showSizeChanger: true,
+                    onShowSizeChange(current, size) {
+                        setPageInfo({ ...pageInfo, pageSize: size });
+                    },
+                    total,
+                    onChange(page, pageSize) {
+                        setPageInfo({ ...pageInfo, page });
+                    },
+                    showQuickJumper: true,
+                }}
+                scroll={{
+                    y: scrollHeight ? scrollHeight : "calc(100vh - 250px)",
+                }}
+                loading={isLoading}
+                dataSource={records}
+                columns={columns}
+                title={title}
+                components={{
+                    header: {
+                        cell: renderTitle,
+                    },
+                }}
+                size="small"
+            />
+            <ToggleExportData
+                vissble={isvisibleExportModal}
+                onClose={() => setIsVisibleExportModal(false)}
+                api={api}
+                name={api}
+            />
+        </>
     );
 };
 

@@ -3,7 +3,7 @@ import { Edit, Trash } from "iconsax-react";
 import { useEffect, useState } from "react";
 import handleApi from "../apis/handleApi";
 import TableComponent from "../components/TableComponent";
-import { ToggleSupplier } from "../modals";
+import { ToggleExportData, ToggleSupplier } from "../modals";
 import { FormModel } from "../models/FormModel";
 import { SupplierModel } from "../models/supplierModel";
 
@@ -94,6 +94,7 @@ const SuppliersScreen = () => {
         <div>
             {forms && (
                 <TableComponent
+                    api="supplier"
                     forms={forms}
                     records={suppliers}
                     isLoading={isLoading}
