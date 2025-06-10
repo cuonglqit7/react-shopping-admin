@@ -86,7 +86,8 @@ const ToggleExportData = (props: Props) => {
             setIsLoading(true);
             try {
                 const res: any = await handleApi(url, data, "post");
-                handleExportExcel(res.data, api);
+                res.data && handleExportExcel(res.data, api);
+                message.success("Export successfully.");
             } catch (error: any) {
                 message.error(error.message);
             } finally {

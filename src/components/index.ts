@@ -1,2 +1,3 @@
 import SiderComponent from "./SiderComponent";
-export { SiderComponent };
+import StatisticComponent from "./StatisticComponent";
+export { SiderComponent, StatisticComponent };
